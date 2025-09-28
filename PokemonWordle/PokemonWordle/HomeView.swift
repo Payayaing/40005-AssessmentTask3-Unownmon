@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State var username: String = ""
+    @StateObject var viewModel = GameViewModel()
     
     var body: some View {
         NavigationStack {
@@ -27,7 +28,7 @@ struct HomeView: View {
                     }
                     .padding()
                     
-                    NavigationLink(destination: GameView()) {
+                    NavigationLink(destination: GameView(viewModel: viewModel)) {
                         HStack {
                             Text("Play! :>")
                         }
@@ -52,6 +53,11 @@ struct HomeView: View {
                 .padding()
             }
         }
+        .onAppear(perform: {
+            Task {
+                await viewModel.setCorrectPokemon()
+            }
+        })
     }
 }
 

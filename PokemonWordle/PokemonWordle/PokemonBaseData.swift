@@ -31,10 +31,10 @@ struct PokemonBaseData: Decodable {
         self.types = types.map({$0.type})
         
         let height = try container.decode(Int.self, forKey: .height)
-        self.height = Double(height / 10)
+        self.height = Double(height) / 10.0
         
         let weight = try container.decode(Int.self, forKey: .weight)
-        self.weight = Double(weight / 10)
+        self.weight = Double(weight) / 10.0
     }
 }
 

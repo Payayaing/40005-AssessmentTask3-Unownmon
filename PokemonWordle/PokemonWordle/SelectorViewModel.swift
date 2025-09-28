@@ -14,7 +14,7 @@ class SelectorViewModel: ObservableObject {
     let decoder = JSONDecoder()
     
     func fetchNames() async -> [String]? {
-        let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=1025&offset=0")!
+        let url = URL(string: "https://pokeapi.co/api/v2/pokemon-species?limit=1025&offset=0")!
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             let response = try decoder.decode(PokemonList.self, from: data)

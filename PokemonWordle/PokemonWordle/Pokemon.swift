@@ -7,11 +7,12 @@
 
 import SwiftUI
 
-struct Pokemon: Identifiable {
-    let id = UUID()
+struct Pokemon: Codable, Identifiable {
+    let id: UUID
     let pokemonData: PokemonData
     
     init(pokemonData: PokemonData) {
+        self.id = UUID()
         self.pokemonData = pokemonData
     }
     

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PokemonData {
+struct PokemonData: Codable {
     let name: String
     let sprite: URL?
     let types: [PokemonType]

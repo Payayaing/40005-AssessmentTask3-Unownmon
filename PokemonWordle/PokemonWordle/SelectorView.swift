@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import Combine
 
 struct SelectorView: View {
     @State var guess: String = ""
-    @StateObject var viewModel = SelectorViewModel()
+    @State var viewModel = SelectorViewModel()
+    @ObservedObject var gameViewModel: GameViewModel
     @State var isLoading: Bool = true
-    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack {
@@ -39,7 +40,7 @@ struct SelectorView: View {
             } else {
                 NavigationStack {
                     List(viewModel.filteredNames, id: \.self) { name in
-                        NavigationLink(destination: PokemonDetailView(name: name)) {
+                        NavigationLink(destination: PokemonDetailView(name: name, viewModel: gameViewModel)) {
                             HStack {
                                 AsyncImage(url: getURL(name: name))
                                 Text(Pokemon.format(name: name))
@@ -71,5 +72,5 @@ struct SelectorView: View {
 }
 
 #Preview {
-    SelectorView()
+    SelectorView(gameViewModel: GameViewModel())
 }

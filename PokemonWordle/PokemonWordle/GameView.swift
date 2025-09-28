@@ -8,17 +8,16 @@
 import SwiftUI
 
 struct GameView: View {
-    @ObservedObject var viewModel = GameViewModel()
-    @State var isLoading: Bool = true
+    @ObservedObject var viewModel: GameViewModel
     
     var body: some View {
         NavigationStack {
             VStack {
-                Text("Unownmon")
-                    .font(.largeTitle)
-                    .bold()
+                if let pokemon = viewModel.correctPokemon {
+                    Text("Correct Pokemon: \(pokemon.pokemonData.name)")
+                }
                 HStack {
-                    NavigationLink(destination: SelectorView()) {
+                    NavigationLink(destination: SelectorView(gameViewModel: viewModel)) {
                         HStack {
                             Text("Make a Guess!")
                         }
@@ -29,11 +28,30 @@ struct GameView: View {
                         .cornerRadius(12)
                     }
                 }
+                
+                ForEach(viewModel.pokemonGuesses) { guess in
+                    GuessView(pokemon: guess)
+                }
+                
+                Button(action: {
+                    Task {
+                        await viewModel.resetGame()
+                    }
+                }) {
+                    HStack {
+                        Text("Reset Game")
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(hex: 0xA6CAF5))
+                    .foregroundColor(.black)
+                    .cornerRadius(12)
+                }
             }
         }
     }
 }
 
 #Preview {
-    GameView()
+    GameView(viewModel: GameViewModel())
 }
