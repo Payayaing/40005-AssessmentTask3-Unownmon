@@ -10,18 +10,13 @@ import Combine
 
 struct PokemonDetailView: View {
     @State var name: String
-    @State var pokemon: Pokemon = Pokemon(pokemonData: PokemonData(name: "", sprite: URL(string: ""), types: [], height: 0, weight: 0, generation: 0))
+    @State var pokemon: Pokemon?
     @ObservedObject var viewModel: GameViewModel
-    @State var isLoading: Bool = true
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack {
-            if isLoading {
-                Spacer()
-                Text("Loading...")
-                Spacer()
-            } else {
+            if let pokemon = pokemon {
                 Text("Name: \(pokemon.pokemonData.name)")
                 AsyncImage(url: pokemon.pokemonData.sprite)
                 ForEach(pokemon.pokemonData.types, id: \.name) { type in
@@ -43,6 +38,10 @@ struct PokemonDetailView: View {
                     .foregroundColor(.black)
                     .cornerRadius(12)
                 }
+            } else {
+                Spacer()
+                Text("Loading...")
+                Spacer()
             }
         }
         .onAppear(perform: {
@@ -50,7 +49,6 @@ struct PokemonDetailView: View {
                 if let data = await viewModel.fetchData(name: name) {
                     self.pokemon = Pokemon(pokemonData: data)
                 }
-                isLoading = false
             }
         })
     }

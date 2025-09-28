@@ -85,7 +85,6 @@ class GameViewModel: ObservableObject {
             let baseResponse = try decoder.decode(PokemonBaseData.self, from: baseData)
             let generationResponse = try decoder.decode(PokemonGenData.self, from: generationData)
             
-            print("Decoded height: \(baseResponse.height), weight: \(baseResponse.weight)")
             return PokemonData(name: baseResponse.name, sprite: baseResponse.sprite, types: baseResponse.types, height: baseResponse.height, weight: baseResponse.weight, generation: generationResponse.generation)
         } catch {
             print("Error occurred while trying to load Pokemon Data: \(error)")

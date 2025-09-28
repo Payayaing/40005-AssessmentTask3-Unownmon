@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct HomeView: View {
-    @State var username: String = ""
     @StateObject var viewModel = GameViewModel()
     
     var body: some View {
@@ -20,13 +19,6 @@ struct HomeView: View {
                     Text("Unownmon")
                         .font(.largeTitle)
                         .bold()
-                    
-                    HStack {
-                        Text("Username:")
-                        TextField("Hi", text: $username)
-                            .textFieldStyle(.roundedBorder)
-                    }
-                    .padding()
                     
                     NavigationLink(destination: GameView(viewModel: viewModel)) {
                         HStack {
@@ -41,7 +33,7 @@ struct HomeView: View {
                     
                     NavigationLink(destination: LeaderboardView()) {
                         HStack {
-                            Text("Leaderboard :>")
+                            Text("Settings :>")
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
