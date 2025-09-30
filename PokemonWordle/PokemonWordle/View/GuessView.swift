@@ -10,19 +10,56 @@ import SwiftUI
 struct GuessView: View {
     @State var guess: Pokemon
     @State var correct: Pokemon
-    
+    @State var comparison: [String: Comparison]?
+    @State var showAlert: Bool = false
+    @State var alertMessage: String = ""
+
     var body: some View {
-        HStack {
-            VStack {
-                Text(guess.pokemonData.name)
-                AsyncImage(url: guess.pokemonData.sprite)
+        HStack(alignment: .center) {
+            AsyncImage(url: guess.pokemonData.sprite)
+            if let comparison = self.comparison {
+                VStack {
+                    Image(comparison["generation"]!.image)
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                }
+                
+                VStack {
+                    Image(comparison["type1"]!.image)
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                }
+                
+                VStack {
+                    Image(comparison["type2"]!.image)
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                }
+                
+                VStack {
+                    Image(comparison["height"]!.image)
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                }
+                
+                VStack {
+                    Image(comparison["weight"]!.image)
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                }
             }
-            ForEach(guess.pokemonData.types, id: \.name) { type in
-                Text(type.format())
-            }
-            Text("\(String(format: "%.1f", guess.pokemonData.height))m")
-            Text("\(String(format: "%.1f", guess.pokemonData.weight))kg")
-            Text("\(guess.pokemonData.generation)")
+        }
+        .onAppear(perform: {
+            self.comparison = self.guess.comparePokemon(second: self.correct)
+        })
+        .onTapGesture {
+            self.alertMessage = "Generation: \(self.guess.getGeneration())\nType 1: \(self.guess.getFirstType())\nType 2: \(self.guess.getSecondType())\nHeight: \(self.guess.getHeight().formatted(.number.precision(.fractionLength(1))))m\nWeight: \(self.guess.getWeight().formatted(.number.precision(.fractionLength(1))))kg"
+            self.showAlert = true
+        }
+        .alert("\(guess.format())", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(alertMessage)
         }
     }
 }

@@ -11,6 +11,8 @@ import Combine
 class GameViewModel: ObservableObject {
     @Published var pokemonGuesses: [Pokemon] = []
     @Published var correctPokemon: Pokemon?
+    @Published var numGuesses: Int = 6
+    @Published var gameFinished: Bool = false
     let decoder = JSONDecoder()
     
     init() {
@@ -25,6 +27,9 @@ class GameViewModel: ObservableObject {
                 self.pokemonGuesses = decoded
             }
         }
+        
+        self.numGuesses = UserDefaults.standard.integer(forKey: "numGuesses")
+        self.gameFinished = UserDefaults.standard.bool(forKey: "gameFinished")
     }
     
     func loadCorrectPokemon() {
@@ -41,6 +46,8 @@ class GameViewModel: ObservableObject {
         if let encoded = try? encoder.encode(self.pokemonGuesses) {
             UserDefaults.standard.set(encoded, forKey: "pokemonGuesses")
         }
+        UserDefaults.standard.set(self.numGuesses, forKey: "numGuesses")
+        UserDefaults.standard.set(self.gameFinished, forKey: "gameFinished")
     }
     
     func saveCorrectPokemon() {
@@ -53,6 +60,8 @@ class GameViewModel: ObservableObject {
     func resetGame() async {
         self.pokemonGuesses = []
         self.correctPokemon = nil
+        self.numGuesses = 6
+        self.gameFinished = false
         UserDefaults.standard.removeObject(forKey: "pokemonGuesses")
         UserDefaults.standard.removeObject(forKey: "correctPokemon")
         await setCorrectPokemon()
@@ -60,6 +69,16 @@ class GameViewModel: ObservableObject {
     
     func addPokemon(pokemon: Pokemon) {
         pokemonGuesses.append(pokemon)
+        self.numGuesses -= 1
+        if let correct = self.correctPokemon {
+            if pokemon.format() == correct.format() {
+                
+            }
+        }
+        
+        if self.numGuesses == 0 {
+            self.gameFinished = true
+        }
         saveGuesses()
     }
     
@@ -99,4 +118,8 @@ struct PokemonList: Codable {
 
 struct PokemonName: Codable {
     let name: String
+}
+
+enum GameState: String, Codable {
+    case won, lost, progress
 }

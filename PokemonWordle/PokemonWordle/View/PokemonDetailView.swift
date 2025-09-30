@@ -13,6 +13,7 @@ struct PokemonDetailView: View {
     @State var pokemon: Pokemon?
     @ObservedObject var viewModel: GameViewModel
     @Environment(\.dismiss) var dismiss
+    @Binding var path: NavigationPath
     
     var body: some View {
         VStack {
@@ -27,7 +28,7 @@ struct PokemonDetailView: View {
                 Text("Generation: \(pokemon.pokemonData.generation)")
                 Button(action: {
                     viewModel.addPokemon(pokemon: pokemon)
-                    dismiss()
+                    path.removeLast(2)
                 }) {
                     HStack {
                         Text("Guess this Pokemon!")

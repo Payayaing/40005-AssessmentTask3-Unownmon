@@ -13,6 +13,7 @@ struct SelectorView: View {
     @State var viewModel = SelectorViewModel()
     @ObservedObject var gameViewModel: GameViewModel
     @State var isLoading: Bool = true
+    @Binding var path: NavigationPath
     
     var body: some View {
         VStack {
@@ -38,18 +39,18 @@ struct SelectorView: View {
                     Spacer()
                 }
             } else {
-                NavigationStack {
-                    List(viewModel.filteredNames, id: \.self) { name in
-                        NavigationLink(destination: PokemonDetailView(name: name, viewModel: gameViewModel)) {
-                            HStack {
-                                AsyncImage(url: getURL(name: name))
-                                Text(Pokemon.format(name: name))
+                List(viewModel.filteredNames, id: \.self) { name in
+                    Button(action: {
+                        path.append(Screen.pokemonDetail(name: name))
+                    }) {
+                        HStack {
+                            AsyncImage(url: getURL(name: name))
+                            Text(Pokemon.format(name: name))
                                     .font(.headline)
-                            }
                         }
                     }
-                    .scrollContentBackground(.hidden)
                 }
+                .scrollContentBackground(.hidden)
             }
         }
         .padding()
@@ -69,8 +70,4 @@ struct SelectorView: View {
             }
         return URL(string: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(index+1).png")
     }
-}
-
-#Preview {
-    SelectorView(gameViewModel: GameViewModel())
 }

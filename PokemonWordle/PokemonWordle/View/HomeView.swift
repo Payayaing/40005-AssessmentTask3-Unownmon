@@ -9,9 +9,10 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject var viewModel = GameViewModel()
+    @State private var path = NavigationPath()
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ZStack {
                 //Placeholder background colour. It's ugly. Change please. :>
                 //Color.teal.ignoresSafeArea()
@@ -20,7 +21,9 @@ struct HomeView: View {
                         .font(.largeTitle)
                         .bold()
                     
-                    NavigationLink(destination: GameView(viewModel: viewModel)) {
+                    Button(action: {
+                        path.append(Screen.game)
+                    }) {
                         HStack {
                             Text("Play! :>")
                         }
@@ -31,7 +34,9 @@ struct HomeView: View {
                         .cornerRadius(12)
                     }
                     
-                    NavigationLink(destination: LeaderboardView()) {
+                    Button(action: {
+                        path.append(Screen.settings)
+                    }) {
                         HStack {
                             Text("Settings :>")
                         }
@@ -44,6 +49,18 @@ struct HomeView: View {
                 }
                 .padding()
             }
+            .navigationDestination(for: Screen.self) { screen in
+                switch screen {
+                case .game:
+                    GameView(viewModel: viewModel, path: $path)
+                case .selector:
+                    SelectorView(gameViewModel: viewModel, path: $path)
+                case .pokemonDetail(let name):
+                    PokemonDetailView(name: name, viewModel: viewModel, path: $path)
+                case .settings:
+                    LeaderboardView()
+                }
+            }
         }
         .onAppear(perform: {
             Task {
@@ -55,4 +72,8 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+}
+
+enum Screen: Hashable {
+    case game, selector, pokemonDetail(name: String), settings
 }
