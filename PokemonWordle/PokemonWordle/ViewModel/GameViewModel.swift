@@ -12,32 +12,40 @@ class GameViewModel: ObservableObject {
     @Published var pokemonGuesses: [Pokemon] = []
     @Published var correctPokemon: Pokemon?
     @Published var numGuesses: Int = 6
-    @Published var gameFinished: Bool = false
+    @Published var gameState: GameState = .progress
     let decoder = JSONDecoder()
     
     init() {
         loadGuesses()
-        loadCorrectPokemon()
+        Task {
+            await loadCorrectPokemon()
+        }
     }
     
     func loadGuesses() {
+        self.numGuesses = UserDefaults.standard.integer(forKey: "numGuesses")
+        if let gameState = UserDefaults.standard.string(forKey: "gameState") {
+            self.gameState = GameState(rawValue: gameState) ?? .progress
+        }
+        
         if let saved = UserDefaults.standard.data(forKey: "pokemonGuesses") {
             let decoder = JSONDecoder()
             if let decoded = try? decoder.decode([Pokemon].self, from: saved) {
                 self.pokemonGuesses = decoded
+            } else {
+                self.pokemonGuesses = []
             }
         }
-        
-        self.numGuesses = UserDefaults.standard.integer(forKey: "numGuesses")
-        self.gameFinished = UserDefaults.standard.bool(forKey: "gameFinished")
     }
     
-    func loadCorrectPokemon() {
+    func loadCorrectPokemon() async {
         if let saved = UserDefaults.standard.data(forKey: "correctPokemon") {
             let decoder = JSONDecoder()
             if let decoded = try? decoder.decode(Pokemon.self, from: saved) {
                 self.correctPokemon = decoded
             }
+        } else {
+            await setCorrectPokemon()
         }
     }
     
@@ -47,7 +55,7 @@ class GameViewModel: ObservableObject {
             UserDefaults.standard.set(encoded, forKey: "pokemonGuesses")
         }
         UserDefaults.standard.set(self.numGuesses, forKey: "numGuesses")
-        UserDefaults.standard.set(self.gameFinished, forKey: "gameFinished")
+        UserDefaults.standard.set(self.gameState.rawValue, forKey: "gameState")
     }
     
     func saveCorrectPokemon() {
@@ -61,7 +69,7 @@ class GameViewModel: ObservableObject {
         self.pokemonGuesses = []
         self.correctPokemon = nil
         self.numGuesses = 6
-        self.gameFinished = false
+        self.gameState = .progress
         UserDefaults.standard.removeObject(forKey: "pokemonGuesses")
         UserDefaults.standard.removeObject(forKey: "correctPokemon")
         await setCorrectPokemon()
@@ -72,12 +80,13 @@ class GameViewModel: ObservableObject {
         self.numGuesses -= 1
         if let correct = self.correctPokemon {
             if pokemon.format() == correct.format() {
-                
+                self.gameState = .won
             }
-        }
-        
-        if self.numGuesses == 0 {
-            self.gameFinished = true
+            else {
+                if self.numGuesses == 0 {
+                    self.gameState = .lost
+                }
+            }
         }
         saveGuesses()
     }
@@ -87,16 +96,16 @@ class GameViewModel: ObservableObject {
             return
         }
         let random = Int.random(in: 1...1025)
-        if let data = await fetchData(name: String(random)) {
+        if let data = await fetchData(index: random) {
             self.correctPokemon = Pokemon(pokemonData: data)
             saveCorrectPokemon()
         }
     }
     
-    func fetchData(name: String) async -> PokemonData? {
+    func fetchData(index: Int) async -> PokemonData? {
         // The Pokemon will always exist, therefore we can forcefully unwrap it in this way instead of using a guard condition. Height & Weight and Generation cannot be found in the same API call, so two calls need to be done to obtain all data needed.
-        let url = URL(string: "https://pokeapi.co/api/v2/pokemon/\(name)")!
-        let generationurl = URL(string: "https://pokeapi.co/api/v2/pokemon-species/\(name)")!
+        let url = URL(string: "https://pokeapi.co/api/v2/pokemon/\(index)")!
+        let generationurl = URL(string: "https://pokeapi.co/api/v2/pokemon-species/\(index)")!
         do {
             let (baseData, _) = try await URLSession.shared.data(from: url)
             let (generationData, _) = try await URLSession.shared.data(from: generationurl)
@@ -120,6 +129,6 @@ struct PokemonName: Codable {
     let name: String
 }
 
-enum GameState: String, Codable {
+enum GameState: String {
     case won, lost, progress
 }

@@ -41,4 +41,11 @@ class SelectorViewModel: ObservableObject {
         }
         return self.pokemonNames.filter { Pokemon.format(name: $0).lowercased().contains(search.lowercased()) }
     }
+    
+    func getApiNumber(name: String) -> Int? {
+        if let index = self.pokemonNames.firstIndex(where: {$0 == name}) {
+            return index + 1
+        }
+        return nil
+    }
 }

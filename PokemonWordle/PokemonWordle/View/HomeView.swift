@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject var viewModel = GameViewModel()
+    @EnvironmentObject var viewModel: GameViewModel
     @State private var path = NavigationPath()
+    @State var showSheet: Bool = false
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -17,9 +18,16 @@ struct HomeView: View {
                 //Placeholder background colour. It's ugly. Change please. :>
                 //Color.teal.ignoresSafeArea()
                 VStack {
-                    Text("Unownmon")
-                        .font(.largeTitle)
-                        .bold()
+                    HStack(spacing: 0) {
+                        Image("unown")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 100, height: 100)
+                        
+                        Text("Unownmon")
+                            .font(.largeTitle)
+                            .bold()
+                    }
                     
                     Button(action: {
                         path.append(Screen.game)
@@ -29,22 +37,24 @@ struct HomeView: View {
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color(hex: 0xA6CAF5))
+                        .background(Color(hex: 0x51F074))
                         .foregroundColor(.black)
                         .cornerRadius(12)
+                        .font(.headline)
                     }
                     
                     Button(action: {
-                        path.append(Screen.settings)
+                        self.showSheet = true
                     }) {
                         HStack {
-                            Text("Settings :>")
+                            Text("Information!")
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color(hex: 0xA6CAF5))
+                        .background(Color(hex: 0xF2F54E))
                         .foregroundColor(.black)
                         .cornerRadius(12)
+                        .font(.headline)
                     }
                 }
                 .padding()
@@ -52,13 +62,11 @@ struct HomeView: View {
             .navigationDestination(for: Screen.self) { screen in
                 switch screen {
                 case .game:
-                    GameView(viewModel: viewModel, path: $path)
+                    GameView(path: $path)
                 case .selector:
-                    SelectorView(gameViewModel: viewModel, path: $path)
-                case .pokemonDetail(let name):
-                    PokemonDetailView(name: name, viewModel: viewModel, path: $path)
-                case .settings:
-                    LeaderboardView()
+                    SelectorView(path: $path)
+                case .pokemonDetail(let index):
+                    PokemonDetailView(index: index, path: $path)
                 }
             }
         }
@@ -67,6 +75,9 @@ struct HomeView: View {
                 await viewModel.setCorrectPokemon()
             }
         })
+        .sheet(isPresented: $showSheet) {
+            InfoView()
+        }
     }
 }
 
@@ -75,5 +86,5 @@ struct HomeView: View {
 }
 
 enum Screen: Hashable {
-    case game, selector, pokemonDetail(name: String), settings
+    case game, selector, pokemonDetail(index: Int)
 }

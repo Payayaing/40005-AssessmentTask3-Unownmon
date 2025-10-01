@@ -8,33 +8,19 @@
 import SwiftUI
 
 struct GameView: View {
-    @ObservedObject var viewModel: GameViewModel
+    @EnvironmentObject var viewModel: GameViewModel
     @State var showAlert: Bool = false
+    @State var showSheet: Bool = false
     @Binding var path: NavigationPath
     
     var body: some View {
-        VStack {
-            if let pokemon = viewModel.correctPokemon {
-                Text("Correct Pokemon: \(pokemon.pokemonData.name)")
-            }
-            Text("Guess that Pokemon! You have \(viewModel.numGuesses) guesses left.")
-            HStack {
-                Button(action: {
-                    path.append(Screen.selector)
-                }) {
-                    HStack {
-                        Text("Make a Guess!")
-                    }
-                    .padding()
-                    .frame(maxWidth: 150)
-                    .background(Color(hex: 0xA6CAF5))
-                    .foregroundColor(.black)
-                    .cornerRadius(12)
-                    .opacity(viewModel.gameFinished ? 0.5 : 1.0)
-                }
-                .disabled(viewModel.gameFinished)
-            }
-                
+        VStack(alignment: .center) {
+            Text("Correct Pokemon: \(viewModel.correctPokemon?.format() ?? "None")")
+            
+            Text("Guess that Pokemon! You have **\(viewModel.numGuesses)** guesses left. Tap on each guess to see Pokemon details.")
+                .multilineTextAlignment(.center)
+            Spacer()
+            
             HStack(alignment: .center) {
                 let list = ["Pokemon", "Gen", "Type 1", "Type 2", "Height", "Weight"]
                 ForEach(list, id:\.self) { item in
@@ -52,45 +38,83 @@ struct GameView: View {
             .padding(.horizontal, 5)
                 
             ScrollView(.vertical) {
-                if viewModel.pokemonGuesses.isEmpty {
-                    Spacer()
-                    Text("Make a Guess!")
-                    Spacer()
-                } else {
-                    ForEach(viewModel.pokemonGuesses) { guess in
-                        GuessView(guess: guess, correct: viewModel.correctPokemon!)
+                ForEach(viewModel.pokemonGuesses) { guess in
+                    GuessView(guess: guess, correct: viewModel.correctPokemon!)
+                }
+            }
+            
+            VStack(spacing: 10) {
+                Button(action: {
+                    path.append(Screen.selector)
+                }) {
+                    HStack {
+                        Text("Make a Guess!")
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(hex: 0x51F074))
+                    .foregroundColor(.black)
+                    .cornerRadius(12)
+                    .opacity(viewModel.gameState != .progress ? 0.5 : 1.0)
+                    .font(.headline)
+                }
+                .disabled(viewModel.gameState != .progress)
+                
+                HStack {
+                    Button(action: {
+                        Task {
+                            await viewModel.resetGame()
+                        }
+                    }) {
+                        HStack {
+                            Text("Reset Game")
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(hex: 0xED4040))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .font(.headline)
+                    }
+                    
+                    Button(action: {
+                        self.showSheet = true
+                    }) {
+                        HStack {
+                            Text("Show Notes")
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(hex: 0x47A1E6))
+                        .foregroundColor(.black)
+                        .cornerRadius(12)
+                        .font(.headline)
                     }
                 }
             }
-                
-            Button(action: {
-                Task {
-                    await viewModel.resetGame()
-                }
-            }) {
-                HStack {
-                    Text("Reset Game")
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color(hex: 0xA6CAF5))
-                .foregroundColor(.black)
-                .cornerRadius(12)
-            }
+            .padding()
         }
-        .onChange(of: viewModel.gameFinished) {
-            if viewModel.gameFinished {
+        .onChange(of: viewModel.gameState) {
+            if viewModel.gameState != .progress {
                 self.showAlert = true
             }
         }
-        .alert("Game Over!", isPresented: $showAlert) {
+        .alert(self.viewModel.gameState == .won ? "You won!" : "You lost :<", isPresented: $showAlert) {
             Button("OK", role: .cancel) {}
         } message: {
             if let correct = viewModel.correctPokemon {
-                Text(":< Aw... ran out of guesses and bitches. The Pokemon was \(correct.format()). Try again bro ^-^")
+                if viewModel.gameState == .won {
+                    Text("You got the correct Pokemon! YIPPEE")
+                } else { // .loss condition. This alert can only be triggered by .won or .loss enum change, so .progress does not need to be considered.
+                    Text(":< Aw... ran out of guesses. The Pokemon was \(correct.format()). Try again ^-^")
+                }
             } else {
-                Text(":< Aw... ran out of guesses and bitches. Try again bro ^-^")
+                Text("Please close this and reset the game! :>")
             }
+        }
+        .sheet(isPresented: $showSheet) {
+            NoteView()
+                .presentationDetents([.medium, .large])
         }
     }
 }

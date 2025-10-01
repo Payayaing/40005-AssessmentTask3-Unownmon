@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct PokemonWordleApp: App {
+    @StateObject var gameViewModel = GameViewModel()
+    @StateObject var noteViewModel = NoteViewModel()
+    
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .environmentObject(gameViewModel)
+                .environmentObject(noteViewModel)
         }
     }
 }
