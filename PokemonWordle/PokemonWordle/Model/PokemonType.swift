@@ -8,12 +8,15 @@
 import SwiftUI
 
 struct PokemonType: Codable {
+    // Holds data and methods for Pokemon typing.
     let name: String
     
+    // Formats the Pokemon name for readability purposes. Since Pokemon types are only one word, they only need to be capitalised.
     func format() -> String {
         return self.name.capitalized
     }
     
+    // When types are displayed, use corresponding colours similar to ones in-game. These hex codes are obtained from https://gist.github.com/apaleslimghost/0d25ec801ca4fc43317bcff298af43c3 .
     func color() -> Color {
         switch (self.name) {
         case "normal":
@@ -57,6 +60,7 @@ struct PokemonType: Codable {
         }
     }
     
+    // Colour for foreground text when put against the above type colour. This is designed to maximise contrast, thus improving readability.
     func textColor() -> Color {
         switch self.name {
         case "normal", "fighting", "poison", "rock", "bug", "ghost", "psychic", "dragon", "dark", "None":

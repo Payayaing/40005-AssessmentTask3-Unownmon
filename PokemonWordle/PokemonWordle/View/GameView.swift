@@ -15,11 +15,12 @@ struct GameView: View {
     
     var body: some View {
         VStack(alignment: .center) {
+            // Include this line when debugging/testing win conditions.
             //Text("Correct Pokemon: \(viewModel.correctPokemon?.format() ?? "None")")
             
             Text("Guess that Pokemon! You have **\(viewModel.numGuesses)** guesses left.\n(Hint: Tap on each guess to see Pokemon details!)")
                 .multilineTextAlignment(.center)
-            Spacer()
+                .padding(.bottom, 10)
             
             HStack(alignment: .center) {
                 let list = ["Pokemon", "Gen", "Type 1", "Type 2", "Height", "Weight"]

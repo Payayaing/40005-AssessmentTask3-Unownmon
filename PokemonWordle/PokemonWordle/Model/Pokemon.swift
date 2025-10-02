@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct Pokemon: Codable, Identifiable {
+    // Pokemon struct contains all relevant data and attributes needed for the application's functionality. PokemonData is defined in PokemonData.swift, which uses PokeAPI information and stores it such that the API does not need to be called continuously for the same Pokemon.
     let id: UUID
     let pokemonData: PokemonData
     
@@ -16,6 +17,7 @@ struct Pokemon: Codable, Identifiable {
         self.pokemonData = pokemonData
     }
     
+    // PokeAPI returns Pokemon names with kebab-case formatting, this should be converted to a more readable formatting. In most cases, Pokemon names only need to be capitalised as well as convert the hyphon to a space; however, there are some names that have custom formatting. These instances are specified to ensure correctness in formatting for all Pokemon.
     static func format(name: String) -> String {
         let customFormat = [
             "nidoran-f": "Nidoran (F)",
@@ -47,6 +49,7 @@ struct Pokemon: Codable, Identifiable {
         return Pokemon.format(name: self.pokemonData.name)
     }
     
+    // Returning pokemonData attributes so that functions wanting this information can use this method instead of using pokemon.pokemonData.[attribute].
     func getGeneration() -> Int {
         return self.pokemonData.generation
     }
@@ -68,9 +71,9 @@ struct Pokemon: Codable, Identifiable {
         return self.pokemonData.weight
     }
     
-    // First is always the Pokemon being guessed, Second is always the correct Pokemon.
+    // First is always the Pokemon being guessed, Second is always the correct Pokemon. Both Strings and Ints are being compared, so a template type T is used (which is assumed to be Comparable).
     func compare<T: Comparable>(first: T, second: T) -> Comparison {
-        if first > second {
+        if first > second { // Guess value is higher than true value, so indicate to the user that they should guess something lower.
             return .lower
         } else if first < second {
             return .higher
@@ -79,6 +82,7 @@ struct Pokemon: Codable, Identifiable {
         }
     }
     
+    // Compares all relevant attributes between guess and correct by using the compare() method on each attribute, returning a custom Comparison enum and storing in a dictionary structure. This is used to efficiently compare all attributes and display them in GameView.
     func comparePokemon(second: Pokemon) -> [String: Comparison] {
         var comparison: [String: Comparison] = [
             "generation": compare(first: self.getGeneration(), second: second.getGeneration()),
@@ -88,6 +92,7 @@ struct Pokemon: Codable, Identifiable {
             "weight": compare(first: self.getWeight(), second: second.getWeight())
         ]
         
+        // Types cannot be higher or lower than each other in the domain of Pokemon, so if the compare() method does not set them as equal, set them as wrong.
         if comparison["type1"] == .higher || comparison["type1"] == .lower {
             comparison["type1"] = .wrong
         }
@@ -96,15 +101,18 @@ struct Pokemon: Codable, Identifiable {
             comparison["type2"] = .wrong
         }
         
+        // Since Pokemon have primary and secondary typings, and the comparison table only compares primary to primary and secondary to secondary, a wrong slot comparison should be provided to notify the user that the type itself is correct, but in the wrong slot.
         if self.getFirstType() == second.getSecondType() {
             comparison["type1"] = .wrongSlot
         } else if self.getSecondType() == second.getFirstType() {
             comparison["type2"] = .wrongSlot
         }
+        
         return comparison
     }
 }
 
+// Custom enum that stores all possible comparisons between attributes, containing an image property which stores image link for each case.
 enum Comparison {
     case higher, lower, equal, wrong, wrongSlot
     

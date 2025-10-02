@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// Custom extension for Color that accepts a hex code format (0xFF0000) to allow for increased flexibility in colour design within the application.
 extension Color {
     init(hex: Int, opacity: Double = 1.0) {
         let red = Double((hex & 0xff0000) >> 16) / 255.0

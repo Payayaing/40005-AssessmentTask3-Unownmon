@@ -14,21 +14,20 @@ struct HomeView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
-            ZStack {
-                //Placeholder background colour. It's ugly. Change please. :>
-                //Color.teal.ignoresSafeArea()
-                VStack {
-                    HStack(spacing: 0) {
-                        Image("unown")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                        
-                        Text("Unownmon")
-                            .font(.largeTitle)
-                            .bold()
-                    }
-                    
+            VStack {
+                HStack(spacing: 0) {
+                    Image("unown")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 65, height: 65)
+                    Text("Unownmon")
+                        .font(.title)
+                        .bold()
+                    Spacer()
+                }
+                .frame(maxWidth: 250)
+                  
+                VStack(spacing: 15) {
                     Button(action: {
                         path.append(Screen.game)
                     }) {
@@ -36,29 +35,33 @@ struct HomeView: View {
                             Text("Play! :>")
                         }
                         .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(hex: 0x51F074))
-                        .foregroundColor(.black)
+                        .frame(maxWidth: 250)
+                        .background(.black)
+                        .foregroundColor(.white)
                         .cornerRadius(12)
                         .font(.headline)
                     }
-                    
+                        
                     Button(action: {
                         self.showSheet = true
                     }) {
                         HStack {
-                            Text("Information!")
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(hex: 0xF2F54E))
-                        .foregroundColor(.black)
-                        .cornerRadius(12)
-                        .font(.headline)
+                            Text("About")
+                    }
+                    .padding()
+                    .frame(maxWidth: 250)
+                    .background(.white)
+                    .foregroundColor(.black)
+                    .cornerRadius(12)
+                    .font(.headline)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.black, lineWidth: 1))
                     }
                 }
                 .padding()
             }
+            .padding()
             .navigationDestination(for: Screen.self) { screen in
                 switch screen {
                 case .game:
@@ -83,6 +86,7 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environmentObject(GameViewModel())
 }
 
 enum Screen: Hashable {
