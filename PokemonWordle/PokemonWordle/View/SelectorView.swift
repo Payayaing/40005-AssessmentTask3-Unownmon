@@ -9,9 +9,7 @@ import SwiftUI
 import Combine
 
 struct SelectorView: View {
-    @State var guess: String = ""
-    @State var viewModel = SelectorViewModel()
-    @EnvironmentObject var gameViewModel: GameViewModel
+    @StateObject var viewModel = SelectorViewModel()
     @State var isLoading: Bool = true
     @Binding var path: NavigationPath
     
@@ -23,13 +21,13 @@ struct SelectorView: View {
             
             HStack {
                 Image(systemName: "magnifyingglass")
-                TextField("Search", text: $guess)
+                TextField("Search", text: $viewModel.search)
                     .textFieldStyle(.roundedBorder)
                     .padding(.horizontal, 10)
-                    .onChange(of: guess) { old, new in
-                        viewModel.filterNames(with: new)
-                    }
                     .autocorrectionDisabled(true)
+                    .onChange(of: viewModel.search) {
+                        viewModel.filter()
+                    }
             }
             
             if isLoading {

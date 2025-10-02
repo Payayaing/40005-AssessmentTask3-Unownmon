@@ -15,9 +15,9 @@ struct GameView: View {
     
     var body: some View {
         VStack(alignment: .center) {
-            Text("Correct Pokemon: \(viewModel.correctPokemon?.format() ?? "None")")
+            //Text("Correct Pokemon: \(viewModel.correctPokemon?.format() ?? "None")")
             
-            Text("Guess that Pokemon! You have **\(viewModel.numGuesses)** guesses left. Tap on each guess to see Pokemon details.")
+            Text("Guess that Pokemon! You have **\(viewModel.numGuesses)** guesses left.\n(Hint: Tap on each guess to see Pokemon details!)")
                 .multilineTextAlignment(.center)
             Spacer()
             
@@ -36,10 +36,16 @@ struct GameView: View {
                 }
             }
             .padding(.horizontal, 5)
-                
+               
             ScrollView(.vertical) {
-                ForEach(viewModel.pokemonGuesses) { guess in
-                    GuessView(guess: guess, correct: viewModel.correctPokemon!)
+                if viewModel.pokemonGuesses.isEmpty {
+                    Text("Make a Guess! :>")
+                        .font(.headline)
+                        .foregroundColor(Color(hex: 0x2A7D3D))
+                } else {
+                    ForEach(viewModel.pokemonGuesses) { guess in
+                        GuessView(guess: guess, correct: viewModel.correctPokemon!)
+                    }
                 }
             }
             

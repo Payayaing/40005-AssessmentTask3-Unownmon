@@ -59,7 +59,7 @@ struct PokemonType: Codable {
     
     func textColor() -> Color {
         switch self.name {
-        case "normal", "fighting", "poison", "rock", "bug", "ghost", "psychic", "dragon", "dark":
+        case "normal", "fighting", "poison", "rock", "bug", "ghost", "psychic", "dragon", "dark", "None":
             return Color.white
         default:
             return Color.black

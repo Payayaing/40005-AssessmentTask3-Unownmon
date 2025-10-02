@@ -21,6 +21,7 @@ struct NoteView: View {
             
             TextEditor(text: $viewModel.content)
                 .frame(maxWidth: .infinity)
+                .autocorrectionDisabled()
             
             HStack {
                 Button(action: {

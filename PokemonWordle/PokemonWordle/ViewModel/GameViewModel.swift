@@ -70,8 +70,10 @@ class GameViewModel: ObservableObject {
         self.correctPokemon = nil
         self.numGuesses = 6
         self.gameState = .progress
-        UserDefaults.standard.removeObject(forKey: "pokemonGuesses")
-        UserDefaults.standard.removeObject(forKey: "correctPokemon")
+        UserDefaults.standard.set(self.pokemonGuesses, forKey: "pokemonGuesses")
+        UserDefaults.standard.set(self.correctPokemon, forKey: "correctPokemon")
+        UserDefaults.standard.set(self.numGuesses, forKey: "numGuesses")
+        UserDefaults.standard.set(self.gameState.rawValue, forKey: "gameState")
         await setCorrectPokemon()
     }
     

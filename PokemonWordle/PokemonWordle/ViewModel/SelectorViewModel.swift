@@ -11,6 +11,7 @@ import Combine
 class SelectorViewModel: ObservableObject {
     @Published var pokemonNames: [String] = []
     @Published var filteredNames: [String] = []
+    @Published var search: String = ""
     let decoder = JSONDecoder()
     
     func fetchNames() async -> [String]? {
@@ -31,15 +32,12 @@ class SelectorViewModel: ObservableObject {
         self.filteredNames = names
     }
     
-    func filterNames(with search: String) {
-        self.filteredNames = filter(search: search)
-    }
-    
-    func filter(search: String) -> [String] {
+    func filter() {
         if search.isEmpty {
-            return self.pokemonNames
+            self.filteredNames = self.pokemonNames
+        } else {
+            self.filteredNames = self.pokemonNames.filter { Pokemon.format(name: $0).lowercased().contains(self.search.lowercased()) }
         }
-        return self.pokemonNames.filter { Pokemon.format(name: $0).lowercased().contains(search.lowercased()) }
     }
     
     func getApiNumber(name: String) -> Int? {
