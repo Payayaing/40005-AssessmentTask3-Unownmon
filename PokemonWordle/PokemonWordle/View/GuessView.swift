@@ -52,10 +52,11 @@ struct GuessView: View {
             }
         }
         .onAppear(perform: {
+            // Upon view appear, load the comparison table to be displayed in the body.
             self.comparison = self.guess.comparePokemon(second: self.correct)
         })
         .onTapGesture {
-            //Show Pokemon stats using the inbuilt Swift alert.
+            // Show Pokemon stats using the inbuilt Swift alert.
             self.alertMessage = "Generation: \(self.guess.getGeneration())\nType 1: \(self.guess.getFirstType())\nType 2: \(self.guess.getSecondType())\nHeight: \(self.guess.getHeight().formatted(.number.precision(.fractionLength(1))))m\nWeight: \(self.guess.getWeight().formatted(.number.precision(.fractionLength(1))))kg"
             self.showAlert = true
         }

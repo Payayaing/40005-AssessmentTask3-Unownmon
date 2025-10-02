@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct InfoView: View {
+    // Application about information which appears on the HomeView sheet.
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -20,6 +21,7 @@ struct InfoView: View {
             Text("You have 6 attempts to figure out the hidden Pokemon! Good luck :>")
                 .multilineTextAlignment(.center)
             
+            // Specifying each image and what it means so the user can understand these in the main game.
             HStack() {
                 VStack {
                     Image("correct")
