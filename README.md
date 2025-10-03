@@ -15,6 +15,7 @@ This application supports the Apple iOS platform, designed on iPhone 17 Pro (thi
 ## Dependencies
 - Uses Swift and SwiftUI for implementation.
 - Minimum deployment is iOS 18.6+
+- Application must be connected to the internet to properly fetch data.
 
 ## Error Handling
 This application prioritises a smooth, intuitive, and informative user experience. When an error occurs (usually from fetching data from the API), the application tends to handle the error silently, preventing fatal crashes by returning default or nil values. If a page is dependent on fetched data, and there was an error obtaining this, the application alerts the user that an error has occurred and takes them back to the previous page.
